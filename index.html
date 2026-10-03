@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Think Before You Prompt</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #07111f;
+            color: white;
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+
+            background: #0d1b2a;
+
+            border: 1px solid #183b56;
+            border-radius: 22px;
+
+            padding: 35px;
+
+            box-shadow: 0 0 35px rgba(0, 229, 204, 0.08);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            display: inline-block;
+
+            background: #102d3b;
+            color: #00e5cc;
+
+            border: 1px solid #00e5cc;
+
+            padding: 7px 14px;
+            border-radius: 20px;
+
+            font-size: 12px;
+            font-weight: bold;
+
+            letter-spacing: 1px;
+
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #a9b8c8;
+            font-size: 16px;
+        }
+
+        .top-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 12px;
+
+            color: #a9b8c8;
+            font-size: 14px;
+        }
+
+        .score {
+            color: #00e5cc;
+            font-weight: bold;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+
+            background: #172b3d;
+
+            border-radius: 10px;
+
+            overflow: hidden;
+
+            margin-bottom: 30px;
+        }
+
+        .progress {
+            height: 100%;
+            width: 0%;
+
+            background: linear-gradient(
+                90deg,
+                #00e5cc,
+                #8b5cf6
+            );
+
+            transition: width 0.3s ease;
+        }
+
+        .question-number {
+            color: #00e5cc;
+
+            font-size: 14px;
+            font-weight: bold;
+
+            margin-bottom: 10px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+        }
+
+        .question {
+            font-size: 25px;
+            line-height: 1.5;
+
+            margin-bottom: 22px;
+
+            color: #ffffff;
+        }
+
+        .policy-box {
+            background: #081521;
+
+            border: 1px solid #24435a;
+
+            border-radius: 14px;
+
+            padding: 20px;
+
+            margin-bottom: 25px;
+        }
+
+        .policy-title {
+            color: #00e5cc;
+
+            font-size: 12px;
+            font-weight: bold;
+
+            letter-spacing: 1.5px;
+
+            margin-bottom: 10px;
+        }
+
+        .policy-text {
+            color: #c9d4df;
+
+            line-height: 1.6;
+
+            font-size: 15px;
+        }
+
+        .answers {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 15px;
+        }
+
+        .answer-btn {
+            border: 1px solid #31516b;
+
+            background: #102335;
+
+            color: white;
+
+            padding: 18px;
+
+            border-radius: 14px;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+            min-height: 65px;
+        }
+
+        .answer-btn:hover {
+            border-color: #00e5cc;
+
+            transform: translateY(-2px);
+        }
+
+        .answer-btn.correct {
+            border-color: #22c55e;
+
+            background: rgba(34, 197, 94, 0.12);
+        }
+
+        .answer-btn.wrong {
+            border-color: #ef4444;
+
+            background: rgba(239, 68, 68, 0.12);
+        }
+
+        .feedback {
+            display: none;
+
+            margin-top: 22px;
+
+            padding: 18px;
+
+            border-radius: 14px;
+
+            line-height: 1.6;
+        }
+
+        .feedback.correct-feedback {
+            display: block;
+
+            background: rgba(34, 197, 94, 0.10);
+
+            border: 1px solid #22c55e;
+        }
+
+        .feedback.wrong-feedback {
+            display: block;
+
+            background: rgba(239, 68, 68, 0.10);
+
+            border: 1px solid #ef4444;
+        }
+
+        .feedback-title {
+            font-weight: bold;
+
+            margin-bottom: 7px;
+
+            font-size: 17px;
+        }
+
+        .correct-title {
+            color: #4ade80;
+        }
+
+        .wrong-title {
+            color: #f87171;
+        }
+
+        .red-flag {
+            display: none;
+
+            margin-top: 14px;
+
+            padding: 15px;
+
+            background: rgba(239, 68, 68, 0.10);
+
+            border-left: 4px solid #ef4444;
+
+            border-radius: 8px;
+
+            color: #fecaca;
+        }
+
+        .next-btn {
+            display: none;
+
+            margin-top: 20px;
+
+            width: 100%;
+
+            padding: 15px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background: linear-gradient(
+                90deg,
+                #00c9b7,
+                #7c3aed
+            );
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .next-btn:hover {
+            opacity: 0.9;
+        }
+
+        .final-screen {
+            display: none;
+
+            text-align: center;
+        }
+
+        .final-icon {
+            font-size: 55px;
+
+            margin-bottom: 15px;
+        }
+
+        .final-screen h2 {
+            font-size: 30px;
+
+            margin-bottom: 10px;
+        }
+
+        .final-score {
+            color: #00e5cc;
+
+            font-size: 22px;
+
+            font-weight: bold;
+
+            margin: 15px 0 25px;
+        }
+
+        .tips {
+            text-align: left;
+
+            background: #081521;
+
+            border: 1px solid #24435a;
+
+            border-radius: 15px;
+
+            padding: 22px;
+
+            margin-top: 20px;
+        }
+
+        .tips h3 {
+            color: #00e5cc;
+
+            margin-bottom: 15px;
+        }
+
+        .tips p {
+            color: #c9d4df;
+
+            margin: 12px 0;
+
+            line-height: 1.5;
+
+            font-size: 16px;
+        }
+
+        .restart-btn {
+            margin-top: 25px;
+
+            padding: 14px 25px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background: #00e5cc;
+
+            color: #06131f;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            font-size: 15px;
+        }
+
+        @media (max-width: 650px) {
+
+            .container {
+                padding: 25px 18px;
+            }
+
+            h1 {
+                font-size: 27px;
+            }
+
+            .question {
+                font-size: 21px;
+            }
+
+            .answers {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="badge">
+            AI × DATA PRIVACY
+        </div>
+
+        <h1>
+            Think Before You Prompt
+        </h1>
+
+        <p class="subtitle">
+            A quick AI data privacy challenge
+        </p>
+
+    </div>
+
+
+    <!-- GAME -->
+
+    <div id="game">
+
+        <div class="top-info">
+
+            <span id="questionCounter">
+                Question 1 of 5
+            </span>
+
+            <span class="score">
+                Score:
+                <span id="score">0</span>
+            </span>
+
+        </div>
+
+
+        <div class="progress-container">
+
+            <div
+                class="progress"
+                id="progress">
+            </div>
+
+        </div>
+
+
+        <div
+            class="question-number"
+            id="questionNumber">
+
+            Scenario 01
+
+        </div>
+
+
+        <div
+            class="question"
+            id="question">
+
+        </div>
+
+
+        <div class="policy-box">
+
+            <div class="policy-title">
+
+                HOW WE USE YOUR DATA
+
+            </div>
+
+
+            <div
+                class="policy-text"
+                id="policyText">
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="answers"
+            id="answers">
+
+        </div>
+
+
+        <div
+            class="feedback"
+            id="feedback">
+
+            <div
+                class="feedback-title"
+                id="feedbackTitle">
+
+            </div>
+
+
+            <div id="feedbackText">
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="red-flag"
+            id="redFlag">
+
+            🚩
+            <strong>Privacy Red Flag:</strong>
+
+            This involves a privacy risk.
+            Always check how your data may be used.
+
+        </div>
+
+
+        <button
+            class="next-btn"
+            id="nextBtn"
+            onclick="nextQuestion()">
+
+            Next Question →
+
+        </button>
+
+    </div>
+
+
+    <!-- FINAL SCREEN -->
+
+    <div
+        class="final-screen"
+        id="finalScreen">
+
+        <div class="final-icon">
+            🛡️
+        </div>
+
+
+        <h2>
+            Challenge Complete!
+        </h2>
+
+
+        <div
+            class="final-score"
+            id="finalScore">
+
+        </div>
+
+
+        <div class="tips">
+
+            <h3>
+                Find these 3 things in the policy:
+            </h3>
+
+
+            <p>
+                🔎
+                <strong>
+                    1. What data do they collect?
+                </strong>
+            </p>
+
+
+            <p>
+                🔎
+                <strong>
+                    2. Why do they use it?
+                </strong>
+            </p>
+
+
+            <p>
+                🔎
+                <strong>
+                    3. Who can they share it with?
+                </strong>
+            </p>
+
+        </div>
+
+
+        <button
+            class="restart-btn"
+            onclick="restartGame()">
+
+            Play Again
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+const questions = [
+
+    /* =================================
+       QUESTION 1
+       ================================= */
+
+    {
+        question:
+        "We may use your conversations to improve and train our AI systems.",
+
+        policy:
+        "Your conversations may be reviewed or processed to help improve the quality and performance of our AI systems.",
+
+        answers: [
+            "🟢 Accept",
+            "🔴 Don't Accept"
+        ],
+
+        correct: 0,
+
+        explanation:
+        "Using conversations to improve AI can be a normal use of data when it is clearly explained and you agree to it."
+    },
+
+
+    /* =================================
+       QUESTION 2
+       ================================= */
+
+    {
+        question:
+        "We may use your photos and files in advertisements and promotional content, which may be shared publicly online.",
+
+        policy:
+        "We may use content you provide, including photos and files, for advertising and promotional purposes.",
+
+        answers: [
+            "🟢 Accept",
+            "🔴 Don't Accept"
+        ],
+
+        correct: 1,
+
+        explanation:
+        "Your photos and files are personal data. Using them in public ads can expose information you never intended to share publicly.",
+
+        redFlag: true
+    },
+
+
+    /* =================================
+       QUESTION 3
+       ================================= */
+
+    {
+        question:
+        "We may display selected parts of your conversations to other users.",
+
+        policy:
+        "Some portions of user conversations may be displayed to other users for service-related purposes.",
+
+        answers: [
+            "🟢 Accept",
+            "🔴 Don't Accept"
+        ],
+
+        correct: 1,
+
+        explanation:
+        "Conversations may contain personal or private information. Sharing them with other users can expose information you did not intend to make public.",
+
+        redFlag: true
+    },
+
+
+    /* =================================
+       QUESTION 4
+       ================================= */
+
+    {
+        question:
+        "For your data privacy, what should you ask yourself before using AI?",
+
+        policy:
+        "Think before you share. Understand how your data may be collected, used, or shared.",
+
+        answers: [
+            "🔍 How are they using my data?",
+            "📱 What features does this AI offer?",
+            "⚡ How quickly can the AI respond?",
+            "🎯 How accurate is the AI?"
+        ],
+
+        correct: 0,
+
+        explanation:
+        "Knowing how your data is used helps you decide what information you are comfortable sharing with AI."
+    },
+
+
+    /* =================================
+       QUESTION 5
+       ================================= */
+
+    {
+        question:
+        "The AI asks you to provide your password, card details, or other sensitive information.",
+
+        policy:
+        "Protect sensitive information such as passwords, card details, and private account information.",
+
+        answers: [
+            "🔐 I won't share sensitive information",
+            "📤 I'll provide the requested information"
+        ],
+
+        correct: 0,
+
+        explanation:
+        "AI does not need your passwords or card details for normal requests. Keep sensitive information private, even when an AI asks for it.",
+
+        redFlag: true
+    }
+
+];
+
+
+let currentQuestion = 0;
+
+let score = 0;
+
+let answered = false;
+
+
+const questionElement =
+    document.getElementById("question");
+
+const policyElement =
+    document.getElementById("policyText");
+
+const answersElement =
+    document.getElementById("answers");
+
+const feedbackElement =
+    document.getElementById("feedback");
+
+const feedbackTitle =
+    document.getElementById("feedbackTitle");
+
+const feedbackText =
+    document.getElementById("feedbackText");
+
+const redFlag =
+    document.getElementById("redFlag");
+
+const nextBtn =
+    document.getElementById("nextBtn");
+
+const progress =
+    document.getElementById("progress");
+
+const questionCounter =
+    document.getElementById("questionCounter");
+
+const questionNumber =
+    document.getElementById("questionNumber");
+
+const scoreElement =
+    document.getElementById("score");
+
+
+/* =================================
+   LOAD QUESTION
+   ================================= */
+
+function loadQuestion() {
+
+    answered = false;
+
+    const q =
+        questions[currentQuestion];
+
+
+    questionElement.textContent =
+        q.question;
+
+
+    policyElement.textContent =
+        q.policy;
+
+
+    questionCounter.textContent =
+        `Question ${currentQuestion + 1} of ${questions.length}`;
+
+
+    questionNumber.textContent =
+        `Scenario ${String(currentQuestion + 1).padStart(2, "0")}`;
+
+
+    progress.style.width =
+        `${((currentQuestion) / questions.length) * 100}%`;
+
+
+    answersElement.innerHTML = "";
+
+
+    feedbackElement.style.display =
+        "none";
+
+
+    redFlag.style.display =
+        "none";
+
+
+    nextBtn.style.display =
+        "none";
+
+
+    q.answers.forEach(
+        (answer, index) => {
+
+            const button =
+                document.createElement("button");
+
+
+            button.className =
+                "answer-btn";
+
+
+            button.textContent =
+                answer;
+
+
+            button.onclick =
+                () => selectAnswer(
+                    index,
+                    button
+                );
+
+
+            answersElement.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+
+/* =================================
+   SELECT ANSWER
+   ================================= */
+
+function selectAnswer(
+    selectedIndex,
+    selectedButton
+) {
+
+    if (answered) return;
+
+
+    answered = true;
+
+
+    const q =
+        questions[currentQuestion];
+
+
+    const buttons =
+        document.querySelectorAll(
+            ".answer-btn"
+        );
+
+
+    buttons.forEach(
+        button => {
+            button.disabled = true;
+        }
+    );
+
+
+    /* CORRECT */
+
+    if (
+        selectedIndex ===
+        q.correct
+    ) {
+
+        score++;
+
+
+        selectedButton.classList.add(
+            "correct"
+        );
+
+
+        feedbackElement.className =
+            "feedback correct-feedback";
+
+
+        feedbackElement.style.display =
+            "block";
+
+
+        feedbackTitle.textContent =
+            "✓ Correct!";
+
+
+        feedbackTitle.className =
+            "feedback-title correct-title";
+
+
+        feedbackText.textContent =
+            q.explanation;
+
+
+        redFlag.style.display =
+            "none";
+
+    }
+
+
+    /* WRONG */
+
+    else {
+
+        selectedButton.classList.add(
+            "wrong"
+        );
+
+
+        buttons[q.correct].classList.add(
+            "correct"
+        );
+
+
+        feedbackElement.className =
+            "feedback wrong-feedback";
+
+
+        feedbackElement.style.display =
+            "block";
+
+
+        feedbackTitle.textContent =
+            "✗ Not quite";
+
+
+        feedbackTitle.className =
+            "feedback-title wrong-title";
+
+
+        feedbackText.textContent =
+            q.explanation;
+
+
+        if (q.redFlag) {
+
+            redFlag.style.display =
+                "block";
+
+        }
+
+    }
+
+
+    scoreElement.textContent =
+        score;
+
+
+    if (
+        currentQuestion <
+        questions.length - 1
+    ) {
+
+        nextBtn.textContent =
+            "Next Question →";
+
+    }
+
+    else {
+
+        nextBtn.textContent =
+            "See My Result →";
+
+    }
+
+
+    nextBtn.style.display =
+        "block";
+
+}
+
+
+/* =================================
+   NEXT QUESTION
+   ================================= */
+
+function nextQuestion() {
+
+    currentQuestion++;
+
+
+    if (
+        currentQuestion <
+        questions.length
+    ) {
+
+        loadQuestion();
+
+    }
+
+    else {
+
+        showFinalScreen();
+
+    }
+
+}
+
+
+/* =================================
+   FINAL SCREEN
+   ================================= */
+
+function showFinalScreen() {
+
+    document.getElementById(
+        "game"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "finalScreen"
+    ).style.display =
+        "block";
+
+
+    progress.style.width =
+        "100%";
+
+
+    document.getElementById(
+        "finalScore"
+    ).textContent =
+        `You scored ${score} out of ${questions.length}!`;
+
+}
+
+
+/* =================================
+   RESTART GAME
+   ================================= */
+
+function restartGame() {
+
+    currentQuestion = 0;
+
+    score = 0;
+
+
+    scoreElement.textContent =
+        "0";
+
+
+    document.getElementById(
+        "game"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "finalScreen"
+    ).style.display =
+        "none";
+
+
+    loadQuestion();
+
+}
+
+
+/* =================================
+   START GAME
+   ================================= */
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
